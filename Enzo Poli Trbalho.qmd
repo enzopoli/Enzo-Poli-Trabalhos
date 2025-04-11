@@ -1,0 +1,127 @@
+---
+title: "Enzo Morales Poli"
+format: html
+editor: visual
+---
+
+```{r}
+#| label: load-packages
+#| include: false
+
+library(tidyverse)
+library(WDI)
+library(ggplot2)
+library(dplyr)
+library(scales)
+```
+
+```{r}
+#| label: carregar graf
+#| include: false
+
+library(tidyverse)
+library(WDI)
+library(ggplot2)
+#código de carregamento dos dados
+# Buscar dados de inflação do Brasil
+dados_inflacao <- WDI(country = "BRA", indicator = "FP.CPI.TOTL.ZG", start = 2000, end = 2023)
+head(dados_inflacao)
+
+
+```
+
+```{r}
+#| label: carregar graf32
+#| include: false
+
+library(tidyverse)
+library(WDI)
+library(ggplot2)
+indicadores <- c(inflacao = "FP.CPI.TOTL.ZG",
+                 pib      = "NY.GDP.MKTP.CD")
+
+# 2) Escolha o ano de corte transversal
+ano <- 2019
+
+
+# 3) Baixe os dados (extra = TRUE traz metadados como região)
+df <- WDI(country = "all",
+          indicator = indicadores,
+          start = ano, end = ano,
+          extra = TRUE) %>%
+  # Retira países sem ambos os indicadores
+  filter(!is.na(inflacao), !is.na(pib))
+
+```
+
+```{r}
+
+
+```
+
+## Gráfico corte Transversal.
+
+Representa dados coletados em um único momento, permitindo comparar diferentes grupos ou variáveis simultaneamente.\
+Relação de inflação com PIB dos demais países.\
+\
+Sobre o gráfico: \
+Este gráfico procura mostrar relação entre PIB e inflação de países separando por regiões no período de 2019. \
+Observa‑se que as economias de maior porte (à direita do eixo) – como EUA, China e União Europeia – concentram-se em níveis baixos e estáveis de inflação (em torno de 0–3 %), refletindo regimes de metas de inflação consolidados. Já entre países de PIB menor há muito mais dispersão, incluindo casos de inflação elevada (acima de 50 %), típicos de economias com fragilidade institucional, déficits fiscais persistentes ou regimes cambiais instáveis.
+
+```{r}
+#| label: graf1
+#| warning: false
+#| echo: false
+
+
+```
+
+```{r}
+#| label: graf32
+#| warning: false
+#| echo: false
+
+
+ggplot(df, aes(x = pib, y = inflacao, color = region)) +
+  geom_point(size = 2, alpha = 0.8) +
+  # Escala log no PIB para melhorar visualização
+  scale_x_log10(labels = comma) +
+  theme_minimal() +
+  theme(
+    legend.position = "right",        # legenda à direita
+    legend.title = element_text(size = 10),
+    legend.text  = element_text(size = 8)
+  ) +
+  labs(
+    title = paste("Inflação vs PIB (corte transversal de", ano, ")"),
+    x     = "PIB total (US$, escala log10)",
+    y     = "Inflação anual (%)",
+    color = "Região")
+
+```
+
+## Gráfico Temporal
+
+Exibe a evolução dos dados ao longo do tempo, facilitando a identificação de tendências, padrões e variações sazonais.\
+Inflação do Brasil ao longo dos anos:\
+O gráfico nos conta que, após picos acima de 8% no início dos anos 2000 – com destaque para 2003, em que pressões fiscais e desvalorização cambial elevaram os preços –, o Brasil entrou num ciclo de desaceleração até 2006 graças ao regime de metas de inflação e à política monetária mais restritiva. Na virada da década, a inflação voltou a subir para cerca de 6% em função do estímulo fiscal e do aumento nos preços de commodities, mas o choque recessivo de 2015‑16 e a crise cambial empurraram o IPCA para patamares ao redor de 9%. Com o aperto forte dos juros reais, a inflação caiu para 3–4% em 2017‑18, atingiu o piso durante a pandemia em 2020 e voltou a disparar em 2021‑22 (acima de 9%) diante de choques globais de oferta e estímulos domésticos, para então desacelerar novamente para cerca de 5–6% em 2023, reflexo do novo ciclo de alta da Selic.
+
+```{r}
+#| label: graf
+#| warning: false
+#| echo: false
+
+
+
+# Criar gráfico de série temporal para inflação
+ggplot(dados_inflacao, aes(x = year, y = FP.CPI.TOTL.ZG)) +
+  geom_line(color = "red") +
+  labs(title = "Inflação do Brasil (2000-2023)",
+       x = "Ano",
+       y = "Inflação (%)") +
+  theme_minimal()
+```
+
+\
+Fontes:\
+<https://databank.worldbank.org/source/world-development-indicators>
