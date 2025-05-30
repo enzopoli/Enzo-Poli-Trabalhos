@@ -1,0 +1,118 @@
+---
+title: "Enzo Morales Poli"
+format: html
+editor: visual
+---
+
+```{r}
+#| label: load-packages
+#| include: false
+
+library(GetBCBData)
+library(tidyverse) 
+library(ggplot2)
+library(gganimate)
+library(gifski)
+library(ragg)
+library(knitr)
+```
+
+```{r}
+#| label: carregar graf
+#| include: false
+
+my.id <- c(ICC = 4393)
+
+df.bcb <- gbcbd_get_series(id = my.id ,
+                           first.date = '2000-01-01',
+                           last.date = Sys.Date(),
+                           format.data = 'long',
+                           use.memoise = TRUE, 
+                           cache.path = tempdir(), # use tempdir for cache folder
+                           do.parallel = FALSE)
+
+glimpse(df.bcb)
+
+
+```
+
+```{r}
+```
+
+```{r}
+
+
+```
+
+## Índice de Confiança do Consumidor
+
+O Índice de Confiança do Consumidor (ICC) busca identificar o sentimento dos consumidores relativo às suas condições financeiras, às suas perspectivas futuras e também a percepção que o consumidor tem das condições econômicas do país.
+
+```{r}
+#| label: graf1
+#| warning: false
+#| echo: false
+
+
+```
+
+```{r}
+#| label: grafico-animado
+#| warning: false
+#| echo: false
+#| fig-align: center
+
+# Criar gráfico com animação
+p <- ggplot(df.bcb, aes(x = ref.date, y = value / 100)) +
+  geom_line(color = "blue", size = 1.2) +
+  labs(title = "Índice de Confiança do Consumidor",
+       subtitle = "Período: {frame_along}",
+       x = "", y = "Índice") +
+  scale_x_date(date_breaks = "2 year", date_labels = "%Y") +
+  theme_light() +
+  transition_reveal(ref.date)
+
+# Criar pasta "figures" se não existir
+dir.create("figures", showWarnings = FALSE)
+
+# Caminho relativo para salvar o GIF
+gif_path <- "figures/grafico_animado_ICC.gif"
+
+# Criar e salvar animação com dimensões seguras
+anim <- animate(
+  p,
+  width = 8, height = 6,             # polegadas
+  units = "in",
+  res = 100,                         # resolução (800x600 px)
+  fps = 20, duration = 10,
+  renderer = gifski_renderer(),
+  device = "ragg_png"
+)
+
+# Salvar o GIF na pasta figures
+anim_save(gif_path, animation = anim)
+
+# Incluir GIF no HTML final
+knitr::include_graphics(gif_path)
+
+```
+
+### Importância do ICC
+
+O ICC é uma ferramenta para entender o comportamento do consumidor, que é um dos principais motores da economia. Quando os consumidores estão confiantes, tendem a aumentar seus gastos, estimulando a produção e o investimento. Mas quando a confiança diminui, há uma tendência à redução do consumo. Assim, o ICC serve como um termômetro antecipado das tendências econômicas.
+
+### Períodos de Estresse no ICC
+
+Historicamente, o ICC no Brasil apresentou quedas significativas em períodos de crise econômica. Durante a recessão iniciada em 2014, o índice caiu acentuadamente, refletindo o aumento do desemprego e a perda de poder de compra das famílias. Outro momento de estresse ocorreu no início da pandemia de COVID-19, quando o ICC atingiu níveis de volatilidade altos devido à incerteza econômica e sanitária.
+
+Entre dezembro de 2024 e fevereiro de 2025, o ICC registrou quedas consecutivas, atingindo 84,8 pontos em abril de 2025. Esse declínio foi atribuído à inflação persistente e ao aumento das taxas de juros, que impactaram negativamente. Em maio de 2025, o índice apresentou uma leve recuperação, subindo para 86,7 pontos, mas ainda indicando um sentimento de pessimismo entre os consumidores.
+
+```         
+```
+
+**Referência:**
+
+BANCO CENTRAL DO BRASIL. *Sistema Gerenciador de Séries Temporais*. Brasília: Banco Central do Brasil, \[s.d.\]. Disponível em: <https://www3.bcb.gov.br/sgspub/localizarseries/localizarSeries.do?method=prepararTelaLocalizarSeries>. Acesso em: 16 maio 2025.\
+**FGV IBRE.** Pela primeira vez desde o início da pandemia, índice de confiança dos consumidores avança com maior intensidade. *Blog da Conjuntura Econômica*, 29 maio 2024. Disponível em: <https://ibre.fgv.br/blog-da-conjuntura-economica/artigos/pela-primeira-vez-desde-o-inicio-da-pandemia-indice-de>. Acesso em: 30 maio 2025.
+
+**IPSOS.** Índice de confiança do consumidor – Janeiro de 2025. *Ipsos*, jan. 2025. Disponível em: <https://www.ipsos.com/pt-br/indice-de-confianca-do-consumidor-janeiro-de-2025>. Acesso em: 30 maio 2025.
